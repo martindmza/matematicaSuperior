@@ -24,6 +24,7 @@ while (i <= cantFunctions)
   funAndIntervalArray = strsplit(funAndIntervalString, "in");
   #el primer elemento es la función
   f = strtrim(funAndIntervalArray{1});
+
   
   #el segundo elemento es el intervalo
   intervalStr = strtrim(funAndIntervalArray{2});
@@ -32,7 +33,8 @@ while (i <= cantFunctions)
   a = intervalArray{1};
   b = intervalArray{3};
   
-  #calculo a sub zero
+  #calculo a sub zero----------------
+  #----------------------------------
   
   
   #calculo los an--------------------
@@ -40,7 +42,7 @@ while (i <= cantFunctions)
   j=0;
   while (j<armonicas)
   
-  j++;
+    j++;
   endwhile
   #----------------------------------
   
@@ -50,7 +52,7 @@ while (i <= cantFunctions)
   j=0;
   while (j<armonicas)
   
-  j++;
+    j++;
   endwhile
   #----------------------------------
   
