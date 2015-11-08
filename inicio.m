@@ -1,16 +1,16 @@
-%interval = input('ingrese el intervalo en el que desea evaluar la funcion. ej [-4;4]: ');
-%armonicas = input('ingrese la cantidad de armónicas a considerar. ej 5: ');
-%printf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
-%functionToWork = input('  f(t)= ','s');
-%w = (2*pi)/2;
 clear 
 clc
-interval = [-10 10];
-armonicas = 5;
-functionToWork = ' 5 in 0<t<2 and -1 in -2<t<0  ';
-w = (2*pi)/2;
-syms t;
 
+interval = input('ingrese el intervalo en el que desea evaluar la funcion. ej [-4;4]: ');
+armonicas = input('ingrese la cantidad de armonicas a considerar. ej 5: ');
+
+fprintf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
+functionToWork = input('  f(t)= ', 's');
+%functionToWork = ' 5 in 0<t<2 and -1 in -2<t<0  ';
+%interval = [-10 10];
+%armonicas = 5;
+
+syms t;
 intervalA = interval(1);
 intervalB = interval(2);
 
@@ -34,7 +34,8 @@ while (j <= cantFunctions)
 end
 T = max(intervals) - min(intervals)
 
-%un ciclo por cada función
+%%%%%%%%%% CALCULO DE INTEGRALES DE LA SF
+
 i=1;
 A0 = zeros(1,cantFunctions);
 An = zeros(armonicas,cantFunctions);
@@ -65,24 +66,15 @@ while (i <= cantFunctions)
  
    j=1;
    while (j<=armonicas)
- 
-     %fa = strcat(f, '*cos(t*', num2str(omega), '*', num2str(j), ')');
-     %FA = str2func(fa);
- 
      An(j,i) = 1/L *(int(F*cos(t*omega*j),a,b));
      j=j+1;
    end
-%   %----------------------------------
-% 
-% 
+   %----------------------------------
+ 
    %calculo los bn--------------------
    
    j=1;
    while (j<=armonicas)
- 
-%     fb = strcat(f, '*sin(t*', num2str(omega), '*', num2str(j), ')');
-%     FB = str2func(fb);
- 
      Bn(j,i) = 1/L *(int(F*sin(t*omega*j),a,b));
      j=j+1;
    end
@@ -90,11 +82,16 @@ while (i <= cantFunctions)
 
   i=i+1;
 end
+
+%%%%%%%%%% FUNCION DE FOURIER
+
 A0total = sum(A0');
 Antotal = sum(An');
 Bntotal = sum(Bn');
 
+
 sf = strcat('@(t) ',num2str(A0total/2),'+');
+
 for i=1:armonicas
    an = num2str(Antotal(i));
    sf = strcat(sf,an,'* cos(', num2str(i*omega),'*t) +');
@@ -107,7 +104,6 @@ SF = str2func(sf);
 
 t = linspace(intervalA,intervalB,100);
 
-%y = @(x) ((x<=2)&(0<=x)).*(x)+((x<=0)&(-2<=x)).*(-x);
 subplot(3,1,1)
 plot(t, SF(t));
 
@@ -118,13 +114,10 @@ for i=1:cantFunctions
    
     funAndIntervalString = strtrim(functions{i});
     funAndIntervalArray = strsplit(funAndIntervalString, 'in');
-    %el primer elemento es la función
-    f = strtrim(funAndIntervalArray{1});
-    %f = strcat('@(t)', f);
 
-    %el segundo elemento es el intervalo
+    f = strtrim(funAndIntervalArray{1});
+ 
     intervalStr = strtrim(funAndIntervalArray{2});
-    %obtengo los extremos a y b del intervalo separando por '<'
     intervalArray = strsplit(intervalStr,'<');
     a = intervalArray{1};
     b = intervalArray{3};
@@ -142,3 +135,14 @@ px = linspace(interval(1),interval(2),length(pfx));
 subplot(3,1,2)
 plot(px, pfx)
 grid
+
+%%%%%%%%%% COEFICIENTES
+
+subplot(3,1,3)
+x = 1:armonicas;
+y = Bntotal;
+stem(x, y); hold on;
+
+x = 1:armonicas;
+y = Antotal;
+stem(x, y); hold off;
