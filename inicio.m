@@ -1,14 +1,15 @@
 clear 
 clc
 
-interval = input('ingrese el intervalo en el que desea evaluar la funcion. ej [-4;4]: ');
-armonicas = input('ingrese la cantidad de armonicas a considerar. ej 5: ');
+%interval = input('ingrese el intervalo en el que desea evaluar la funcion. ej [-4;4]: ');
+%armonicas = input('ingrese la cantidad de armonicas a considerar. ej 5: ');
 
-fprintf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
-functionToWork = input('  f(t)= ', 's');
-%functionToWork = ' 5 in 0<t<2 and -1 in -2<t<0  ';
-%interval = [-10 10];
-%armonicas = 5;
+%fprintf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
+%functionToWork = input('  f(t)= ', 's');
+
+functionToWork = ' t in 0<t<2 and -t in -2<t<0  ';
+interval = [-10 10];
+armonicas = 5;
 
 syms t;
 intervalA = interval(1);
@@ -146,3 +147,78 @@ stem(x, y); hold on;
 x = 1:armonicas;
 y = Antotal;
 stem(x, y); hold off;
+
+syms t;
+
+%%%%%%%%%% ERROR
+
+An = zeros(5000,cantFunctions);
+Bn = zeros(5000,cantFunctions);
+sf= '';
+n = 1;
+while 1
+		
+    i = 1;   
+    while (i <= cantFunctions)
+
+        funAndIntervalString = strtrim(functions{i});
+        funAndIntervalArray = strsplit(funAndIntervalString, 'in');
+        f = strtrim(funAndIntervalArray{1});
+        F = sym(f);
+        L = T/2;
+      
+        omega = 2*pi/T;
+
+        intervalStr = strtrim(funAndIntervalArray{2});
+        intervalArray = strsplit(intervalStr,'<');
+        a = str2double(intervalArray{1});
+        b = str2double(intervalArray{3});
+
+        An(n,i) = 1/L *(int(F*cos(t*omega*n),a,b));
+        Bn(n,i) = 1/L *(int(F*sin(t*omega*n),a,b));
+       
+        i = i + 1;
+    end
+		Antotal = sum(An');
+		Bntotal = sum(Bn');
+  
+  	sf = strcat(sf,num2str(Antotal(n)),'* cos(', num2str(i*omega),'*t) +');
+    sf = strcat(sf,num2str(Bntotal(n)),'* sin(', num2str(i*omega),'*t) +');
+    sf = strcat(sf, '0');	
+    fs = strcat('@(t) abs(', sf, ')');
+    FN = str2func(fs);
+
+    NA = integral(FN, a, b) ;
+  
+  	i = 1;
+    A = 0;
+  	while (i <= cantFunctions)
+       
+        funAndIntervalString = strtrim(functions{i});
+        funAndIntervalArray = strsplit(funAndIntervalString, 'in');
+        f = strtrim(funAndIntervalArray{1});
+        
+        intervalStr = strtrim(funAndIntervalArray{2});
+        intervalArray = strsplit(intervalStr,'<');
+        a = str2double(intervalArray{1});
+        b = str2double(intervalArray{3});
+  		
+
+      	F = sym(abs(str2double(f))); %%%%%%%%% Pensar como hacer para diferenciar constante de funcion.
+        %f = strcat('@(t) abs(', f, ')');
+        %F = str2func(f);
+  		A = A + int(F, a, b);
+        
+        i = i + 1;
+    end
+  
+    error = (double(A) - NA ) / double(A);
+
+    if abs(error) < 0.05 || 20 < n 
+        break;
+  	end
+    
+    n = n + 1;
+end
+    fprintf(strcat(num2str(n),'\n'));
+    fprintf(num2str(error));
