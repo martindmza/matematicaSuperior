@@ -7,7 +7,7 @@ clc
 %fprintf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
 %functionToWork = input('  f(t)= ', 's');
 
-functionToWork = ' t in 0<t<2 and -t in -2<t<0  ';
+functionToWork = ' 5 in 0<t<2 and -1 in -2<t<0  ';
 interval = [-10 10];
 armonicas = 5;
 
@@ -204,17 +204,16 @@ while 1
         b = str2double(intervalArray{3});
   		
 
-      	F = sym(abs(str2double(f))); %%%%%%%%% Pensar como hacer para diferenciar constante de funcion.
-        %f = strcat('@(t) abs(', f, ')');
-        %F = str2func(f);
-  		A = A + int(F, a, b);
+        f = strcat('@(t) abs(', f, ' + t*0)');
+        F = str2func(f);
+  		A = A + integral(F, a, b);
         
         i = i + 1;
     end
   
-    error = (double(A) - NA ) / double(A);
+    error = (A - NA ) / A;
 
-    if abs(error) < 0.05 || 20 < n 
+    if abs(error) < 0.05 || 100 < n 
         break;
   	end
     
