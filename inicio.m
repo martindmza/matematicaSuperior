@@ -1,15 +1,15 @@
 clear 
 clc
 
-%interval = input('ingrese el intervalo en el que desea evaluar la funcion. ej [-4;4]: ');
-%armonicas = input('ingrese la cantidad de armonicas a considerar. ej 5: ');
+interval = input('ingrese el intervalo en el que desea evaluar la funcion. ej [-4 4]: ');
+armonicas = input('ingrese la cantidad de armonicas a considerar. ej 5: ');
 
-%fprintf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
-%functionToWork = input('  f(t)= ', 's');
+fprintf('ingrese la funcion a trabajar. ej f(t) = t-4 in 1<t<2 and t + 4 in 2<t<3 : \n');
+functionToWork = input('  f(t)= ', 's');
 
-functionToWork = ' 5 in 0<t<2 and -1 in -2<t<0  ';
-interval = [-10 10];
-armonicas = 5;
+% functionToWork = ' 5 in 0<t<2 and -1 in -2<t<0  ';
+% interval = [-10 10];
+% armonicas = 5;
 
 syms t;
 intervalA = interval(1);
@@ -33,7 +33,7 @@ while (j <= cantFunctions)
     i = i+2;
     j = j+1;
 end
-T = max(intervals) - min(intervals)
+T = max(intervals) - min(intervals);
 
 %%%%%%%%%% CALCULO DE INTEGRALES DE LA SF
 
@@ -85,11 +85,17 @@ while (i <= cantFunctions)
 end
 
 %%%%%%%%%% FUNCION DE FOURIER
+fprintf('Calculando serie de fourier de f(t) ...\n\n');
 
-A0total = sum(A0');
-Antotal = sum(An');
-Bntotal = sum(Bn');
-
+if ( 1 < cantFunctions )
+    A0total = sum(A0');
+    Antotal = sum(An');
+    Bntotal = sum(Bn');
+else
+    A0total = A0;
+    Antotal = An;
+    Bntotal = Bn;
+end
 
 sf = strcat('@(t) ',num2str(A0total/2),'+');
 
@@ -109,6 +115,7 @@ subplot(3,1,1)
 plot(t, SF(t));
 
 %%%%%%%%%% FUNCION ORIGINAL
+fprintf('graficando f(t) ...\n\n');
 
 fo = '@(t)';
 for i=1:cantFunctions
@@ -138,6 +145,7 @@ plot(px, pfx)
 grid
 
 %%%%%%%%%% COEFICIENTES
+fprintf('Graficando los coeficientes de la serie de fs(t) ...\n\n');
 
 subplot(3,1,3)
 x = 1:armonicas;
@@ -151,9 +159,11 @@ stem(x, y); hold off;
 syms t;
 
 %%%%%%%%%% ERROR
+fprintf('Calculando cantidad de armónicas para un error inferior al 0,05 por ciento ...\n\n');
 
-An = zeros(5000,cantFunctions);
-Bn = zeros(5000,cantFunctions);
+
+An = zeros(55,cantFunctions);
+Bn = zeros(55,cantFunctions);
 sf= '';
 n = 1;
 while 1
@@ -179,8 +189,14 @@ while 1
        
         i = i + 1;
     end
-		Antotal = sum(An');
-		Bntotal = sum(Bn');
+    
+    if ( 1 < cantFunctions )
+        Antotal = sum(An');
+        Bntotal = sum(Bn');
+    else
+        Antotal = An;
+        Bntotal = Bn;
+    end
   
   	sf = strcat(sf,num2str(Antotal(n)),'* cos(', num2str(i*omega),'*t) +');
     sf = strcat(sf,num2str(Bntotal(n)),'* sin(', num2str(i*omega),'*t) +');
@@ -213,11 +229,11 @@ while 1
   
     error = (A - NA ) / A;
 
-    if abs(error) < 0.05 || 100 < n 
+    if abs(error) < 0.05 || 51 < n 
         break;
   	end
     
     n = n + 1;
 end
-    fprintf(strcat(num2str(n),'\n'));
-    fprintf(num2str(error));
+
+fprintf(strcat('La cantidad de armonicas para que la serie contenga un error inferior a 0,05 es la siguiente:',num2str(n),'\n'));
